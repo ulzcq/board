@@ -3,6 +3,7 @@ package hello.board.domain.member;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -25,9 +26,13 @@ public class H2MemberRepository implements MemberRepository {
 
     @Override
     public Member findByLoginId(String loginId) {
-        return em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
-                .setParameter("loginId", loginId)
-                .getSingleResult();
+        try{
+            return em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
+                    .setParameter("loginId", loginId)
+                    .getSingleResult();
+        } catch(NoResultException e){
+            return null;
+        }
     }
 
     @Override
