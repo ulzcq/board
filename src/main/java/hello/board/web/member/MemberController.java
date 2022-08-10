@@ -68,7 +68,7 @@ public class MemberController {
 
     /** 로그인 */
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute LoginDto loginDto, BindingResult result,
+    public String login(@Validated @ModelAttribute("form") LoginDto loginDto, BindingResult result,
                         @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request){
         //1) 검증 에러가 있으면 로그인 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
