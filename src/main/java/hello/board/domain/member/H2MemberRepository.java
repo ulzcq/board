@@ -1,5 +1,6 @@
 package hello.board.domain.member;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -8,10 +9,10 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class H2MemberRepository implements MemberRepository {
 
-    @PersistenceContext
-    EntityManager em;
+    private final EntityManager em;
 
     @Override
     public Long save(Member member) {
