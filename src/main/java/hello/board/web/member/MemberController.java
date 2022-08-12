@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor // final 붙은 객체 의존관계 주입
 public class MemberController {
 
+    private final MemberServiceImpl memberServiceImpl;
 
     /** 회원 가입 폼 */
     @GetMapping("/members/new")
@@ -43,7 +44,7 @@ public class MemberController {
         //에러가 없으면 회원가입 처리 : dto -> entity
         Member member = signUpMemberDto.toEntity();
 
-        Long savedId = memberService.join(member);
+        Long savedId = memberServiceImpl.join(member);
         //2) 회원가입 실패 시 회원가입 폼으로 다시 돌려보낸다
         if(savedId == null){
             return "members/signUpMemberForm";
@@ -71,7 +72,7 @@ public class MemberController {
         }
 
         //에러가 없으면 로그인
-        Member loginMember = memberService.login(loginDto.getLoginId(), loginDto.getPassword());
+        Member loginMember = memberServiceImpl.login(loginDto.getLoginId(), loginDto.getPassword());
 
         //2) null 이면 실패하고 로그인 폼으로 다시 돌려보낸다
         if(loginMember == null){
