@@ -2,7 +2,7 @@ package hello.board.web.member;
 
 import hello.board.SessionConst;
 import hello.board.domain.member.Member;
-import hello.board.domain.member.MemberService;
+import hello.board.domain.member.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,6 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor // final 붙은 객체 의존관계 주입
 public class MemberController {
 
-    private final MemberService memberService;
 
     /** 회원 가입 폼 */
     @GetMapping("/members/new")
@@ -41,12 +40,8 @@ public class MemberController {
             return "members/signUpMemberForm";
         }
 
-        //에러가 없으면 회원가입 처리 : form -> entity
-        Member member = new Member(
-                signUpMemberDto.getLoginId(),
-                signUpMemberDto.getPassword(),
-                signUpMemberDto.getName()
-        );
+        //에러가 없으면 회원가입 처리 : dto -> entity
+        Member member = signUpMemberDto.toEntity();
 
         Long savedId = memberService.join(member);
         //2) 회원가입 실패 시 회원가입 폼으로 다시 돌려보낸다

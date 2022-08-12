@@ -1,5 +1,6 @@
 package hello.board.web.member;
 
+import hello.board.domain.member.Member;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -19,4 +20,8 @@ public class SignUpMemberDto {
     @NotBlank
     @Size(min =2, max = 20)
     private String name;
+
+    public Member toEntity(){
+        return new Member(loginId, password, name);
+    }
 }
