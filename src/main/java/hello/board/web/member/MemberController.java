@@ -6,6 +6,7 @@ import hello.board.domain.member.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class MemberController {
 
     /** 회원 가입 폼 */
     @GetMapping("/members/new")
-    public String createForm(@ModelAttribute("form") SignUpMemberDto signUpMemberDto){
+    public String createForm(@ModelAttribute("singUpForm") SignUpMemberDto signUpMemberDto){
         return "members/signUpMemberForm";
     }
 
@@ -34,7 +35,7 @@ public class MemberController {
      *  유효성 검사 복습하기 @Validated, BindingResult
      */
     @PostMapping("/members/new")
-    public String create(@Validated @ModelAttribute("form") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
+    public String create(@Validated @ModelAttribute("singUpForm") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
         //1) 검증 에러가 있으면 회원가입 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
             log.info("errors= {}", result);
@@ -58,13 +59,14 @@ public class MemberController {
 
     /** 로그인 화면 폼 */
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("form") LoginDto loginDto){
+    public String loginForm(@ModelAttribute("loginForm") LoginDto loginDto){
         return "login/loginForm";
     }
 
     /** 로그인 */
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute("form") LoginDto loginDto, BindingResult result,
+    @ExceptionHandler
+    public String login(@Validated @ModelAttribute("loginForm") LoginDto loginDto, BindingResult result,
                         @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request){
         //1) 검증 에러가 있으면 로그인 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
@@ -76,7 +78,8 @@ public class MemberController {
 
         //2) null 이면 실패하고 로그인 폼으로 다시 돌려보낸다
         if(loginMember == null){
-            result.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다");
+            result.reject("loginFail", "아이디 또는 비밀번호를 잘못 입력했습니다\n" +
+                    "입력하신 내용을 다시 확인해주세요.");
             return "login/loginForm";
         }
 
