@@ -27,7 +27,7 @@ public class MemberController {
 
     /** 회원 가입 폼 */
     @GetMapping("/members/new")
-    public String createForm(@ModelAttribute("singUpForm") SignUpMemberDto signUpMemberDto){
+    public String createForm(@ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto){
         return "members/signUpMemberForm";
     }
 
@@ -35,7 +35,7 @@ public class MemberController {
      *  유효성 검사 복습하기 @Validated, BindingResult
      */
     @PostMapping("/members/new")
-    public String create(@Validated @ModelAttribute("singUpForm") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
+    public String create(@Validated @ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
         //1) 검증 에러가 있으면 회원가입 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
             log.info("errors= {}", result);
@@ -55,6 +55,15 @@ public class MemberController {
         redirectAttributes.addFlashAttribute("result", true);
 
         return "redirect:/"; //홈 화면으로
+    }
+
+    @GetMapping("/member/{memberId}")
+    public String viewMyInfo(@PathVariable("memberId") Long memberId, Model model){
+        Member member = memberServiceImpl.findOne(memberId);
+        MemberInfoDto memberInfoDto = new MemberInfoDto(member.getLoginId(),member.getName());
+
+        model.addAttribute("member", memberInfoDto);
+        return "members/viewMyInfo";
     }
 
     /** 로그인 화면 폼 */
