@@ -1,6 +1,7 @@
 package hello.board.domain.member;
 
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +25,7 @@ public class Member {
     @Column(nullable = false, length = 20, unique = true)
     private String loginId; //로그인 ID
 
-    @Column(nullable = false, length = 15)
+    @Column(nullable = false)
     private String password; //비밀번호
 
     @Column(nullable = false, length = 20)
@@ -46,9 +47,18 @@ public class Member {
         this.name = name;
     }
 
-    //TODO: 패스워드 암호화
-    public void updatePassword(String password) {
-        this.password = password;
+    public void updatePassword(PasswordEncoder passwordEncoder, String password) {
+        this.password = passwordEncoder.encode(password);
+    }
+
+    /** 패스워드 암호화/확인 메서드 */
+
+    public void encodePassword(PasswordEncoder passwordEncoder){
+        this.password = passwordEncoder.encode(password);
+    }
+
+    public boolean matchPassword(PasswordEncoder passwordEncoder, String inputPassword){
+        return passwordEncoder.matches(inputPassword, this.password);
     }
 
 }
