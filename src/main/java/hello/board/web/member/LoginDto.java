@@ -9,10 +9,8 @@ import javax.validation.constraints.Size;
 public class LoginDto {
 
     @NotBlank
-    @Size(min =6, max = 20)
     private String loginId;
 
     @NotBlank
-    @Size(min =8, max = 15)
     private String password;
 }
