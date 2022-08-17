@@ -2,6 +2,7 @@ package hello.board.web.member;
 
 import hello.board.SessionConst;
 import hello.board.domain.member.Member;
+import hello.board.MemberConst;
 import hello.board.domain.member.MemberServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,8 +88,7 @@ public class MemberController {
 
         //2) null 이면 실패하고 로그인 폼으로 다시 돌려보낸다
         if(loginMember == null){
-            result.reject("loginFail", "아이디 또는 비밀번호를 잘못 입력했습니다\n" +
-                    "입력하신 내용을 다시 확인해주세요.");
+            result.reject("loginFail", MemberConst.INCORRECT_ACCOUNT);
             return "login/loginForm";
         }
 

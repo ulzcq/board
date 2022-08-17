@@ -11,7 +11,7 @@ public interface MemberService {
 
     Member update(Member member); //회원 정보 수정
 
-    Member getMyInfo(); //내 정보(회원) 조회
+    Member getMyInfo(Long memberId); //내 정보(회원) 조회
 
     /** 관리자 조회 */
     List<Member> findMembers(); //전체 회원 조회

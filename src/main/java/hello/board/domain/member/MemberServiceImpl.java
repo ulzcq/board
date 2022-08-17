@@ -1,9 +1,8 @@
 package hello.board.domain.member;
 
-import hello.board.web.member.MemberInfoDto;
-import hello.board.web.member.SignUpMemberDto;
+import hello.board.MemberConst;
+import hello.board.global.exception.MemberException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,7 @@ public class MemberServiceImpl implements MemberService {
         //DB에 Id를 가진 회원이 있는지 확인
         Member findMember = memberRepository.findByLoginId(member.getLoginId());
         if(findMember != null){
-            throw new IllegalStateException("이미 존재하는 아이디 입니다."); //TODO: 예외처리
+            throw new MemberException(MemberConst.USERID_ALREADY_EXIST); //TODO: 예외처리
         }
     }
 
@@ -43,15 +42,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /** 회원 정보 수정 */
+    @Transactional
     @Override
     public Member update(Member member) {
         //TODO
+        return null;
     }
 
     /** 내 정보 조회*/
     @Override
-    public Member getMyInfo() {
-        //TODO
+    public Member getMyInfo(Long memberId) {
+        return memberRepository.findById(memberId);
     }
 
     /** 전체 회원 조회 */
@@ -61,7 +62,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /** 회원 1명 조회 */
-    @Transactional
     public Member findOne(Long memberId){
         return memberRepository.findById(memberId);
     }
