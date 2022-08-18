@@ -58,11 +58,18 @@ public class MemberController {
         return "redirect:/"; //홈 화면으로
     }
 
+    /** 내 정보 조회 */
     @GetMapping("/member/{memberId}")
-    public String viewMyInfo(@PathVariable("memberId") Long memberId, Model model){
-        Member member = memberServiceImpl.findOne(memberId);
-        MemberInfoDto memberInfoDto = new MemberInfoDto(member.getLoginId(),member.getName());
+    public String viewMyInfo(
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+            @PathVariable("memberId") Long memberId, Model model){
 
+        if(loginMember.getId() != memberId){
+            //다른 멤버 아이디로 url 조회 시 로그인 폼으로
+            return "redirect:/login";
+        }
+
+        MemberInfoDto memberInfoDto = new MemberInfoDto(loginMember);
         model.addAttribute("member", memberInfoDto);
         return "members/viewMyInfo";
     }
