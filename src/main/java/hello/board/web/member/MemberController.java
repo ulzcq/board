@@ -28,7 +28,7 @@ public class MemberController {
 
     /** 회원 가입 폼 */
     @GetMapping("/members/new")
-    public String createForm(@ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto){
+    public String signUpForm(@ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto){
         return "members/signUpMemberForm";
     }
 
@@ -36,7 +36,7 @@ public class MemberController {
      *  유효성 검사 복습하기 @Validated, BindingResult
      */
     @PostMapping("/members/new")
-    public String create(@Validated @ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
+    public String singUp(@Validated @ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
         //1) 검증 에러가 있으면 회원가입 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
             log.info("errors= {}", result);
@@ -58,9 +58,9 @@ public class MemberController {
         return "redirect:/"; //홈 화면으로
     }
 
-    /** 내 정보 조회 */
+    /** 내 정보 조회 및 프로필 수정화면 폼 */
     @GetMapping("/member/{memberId}")
-    public String viewMyInfo(
+    public String viewModifyProfile(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             @PathVariable("memberId") Long memberId, Model model){
 
@@ -69,9 +69,23 @@ public class MemberController {
             return "redirect:/login";
         }
 
-        MemberInfoDto memberInfoDto = new MemberInfoDto(loginMember);
-        model.addAttribute("member", memberInfoDto);
-        return "members/viewMyInfo";
+        ModifyMemberDto modifyMemberDto = new ModifyMemberDto(loginMember);
+        model.addAttribute("member", modifyMemberDto);
+        return "members/modifyProfileForm";
+    }
+
+    /** 프로필 수정 */
+    @PutMapping("/member/{memberId}")
+    public String modifyMember(@Validated @ModelAttribute("member") ModifyMemberDto modifyMemberDto, BindingResult result){
+
+        if(result.hasErrors()){
+            return "member/modify/{memberId}";
+        }
+
+        Member member = memberServiceImpl.findOne(modifyMemberDto.getMemberId());
+        member.updateName(modifyMemberDto.getName()); //이름 수정
+
+        return "redirect:/members/modifyProfileForm";
     }
 
     /** 로그인 화면 폼 */
