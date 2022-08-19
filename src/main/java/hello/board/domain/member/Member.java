@@ -39,10 +39,6 @@ public class Member {
 
     /** update 메서드 */
 
-    public void updateLoginId(String loginId) {
-        this.loginId = loginId;
-    }
-
     public void updateName(String name) {
         this.name = name;
     }
