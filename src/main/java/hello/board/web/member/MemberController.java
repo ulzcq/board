@@ -4,6 +4,7 @@ import hello.board.SessionConst;
 import hello.board.domain.member.Member;
 import hello.board.MemberConst;
 import hello.board.domain.member.MemberServiceImpl;
+import hello.board.global.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -40,7 +41,7 @@ public class MemberController {
         //1) 검증 에러가 있으면 회원가입 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
             log.info("errors= {}", result);
-            return "members/signUpMemberForm";
+            return "member/signUpMemberForm";
         }
 
         //에러가 없으면 회원가입 처리 : dto -> entity
@@ -49,7 +50,7 @@ public class MemberController {
         Long savedId = memberServiceImpl.join(member);
         //2) 회원가입 실패 시 회원가입 폼으로 다시 돌려보낸다
         if(savedId == null){
-            return "members/signUpMemberForm";
+            return "member/signUpMemberForm";
         }
 
         //회원가입 완료창 띄우기 위한 attribute
@@ -64,40 +65,48 @@ public class MemberController {
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             @PathVariable("memberId") Long memberId, Model model){
 
+        //다른 멤버 아이디로 url 조회 시 로그인 폼으로
         if(loginMember.getId() != memberId){
-            //다른 멤버 아이디로 url 조회 시 로그인 폼으로
             return "redirect:/login";
         }
 
-        ModifyMemberDto modifyMemberDto = new ModifyMemberDto(loginMember);
+        Member findMember = memberServiceImpl.findOne(memberId);
+        if(findMember == null){
+            throw new MemberException(MemberConst.NOT_FOUND_MEMBER);
+        }
+        ModifyMemberDto modifyMemberDto = new ModifyMemberDto(findMember);
         model.addAttribute("member", modifyMemberDto);
-        return "members/modifyProfileForm";
+
+        return "member/modifyProfileForm";
     }
 
     /** 프로필 수정 */
-    @PutMapping("/member/{memberId}")
-    public String modifyMember(@Validated @ModelAttribute("member") ModifyMemberDto modifyMemberDto, BindingResult result){
+    @PostMapping("/member/{memberId}")
+    public String modifyMember(@Validated @ModelAttribute("member") ModifyMemberDto modifyMemberDto, BindingResult result,
+                               @PathVariable("memberId") Long memberId, RedirectAttributes redirectAttributes){
 
+        //검증 에러가 있으면 다시 돌려보낸다
         if(result.hasErrors()){
-            return "member/modify/{memberId}";
+            return "member/modifyProfileForm";
         }
+        memberServiceImpl.update(memberId, modifyMemberDto);
 
-        Member member = memberServiceImpl.findOne(modifyMemberDto.getMemberId());
-        member.updateName(modifyMemberDto.getName()); //이름 수정
+        //완료창 띄우기 위한 attribute
+        redirectAttributes.addFlashAttribute("result", true);
 
-        return "redirect:/members/modifyProfileForm";
+        return "redirect:/member/{memberId}";
     }
 
     /** 로그인 화면 폼 */
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("loginForm") LoginDto loginDto){
+    public String loginForm(@ModelAttribute("member") LoginDto loginDto){
         return "login/loginForm";
     }
 
     /** 로그인 */
     @PostMapping("/login")
     @ExceptionHandler
-    public String login(@Validated @ModelAttribute("loginForm") LoginDto loginDto, BindingResult result,
+    public String login(@Validated @ModelAttribute("member") LoginDto loginDto, BindingResult result,
                         @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request){
         //1) 검증 에러가 있으면 로그인 폼으로 다시 돌려보낸다
         if(result.hasErrors()){

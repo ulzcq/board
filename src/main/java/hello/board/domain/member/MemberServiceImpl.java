@@ -2,6 +2,7 @@ package hello.board.domain.member;
 
 import hello.board.MemberConst;
 import hello.board.global.exception.MemberException;
+import hello.board.web.member.ModifyMemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,9 +41,9 @@ public class MemberServiceImpl implements MemberService {
     /** 회원 정보 수정 */
     @Transactional
     @Override
-    public Member update(Member member) {
-        //TODO
-        return null;
+    public void update(Long memberId, ModifyMemberDto modifyMemberdto) {
+        Member member = memberRepository.findById(memberId);
+        member.updateName(modifyMemberdto.getName()); //이름 변경
     }
 
     /** 내 정보 조회*/

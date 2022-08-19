@@ -1,5 +1,7 @@
 package hello.board.domain.member;
 
+import hello.board.web.member.ModifyMemberDto;
+
 import java.util.List;
 
 public interface MemberService {
@@ -9,7 +11,7 @@ public interface MemberService {
 
     Member login(String loginId, String password); //로그인
 
-    Member update(Member member); //회원 정보 수정
+    void update(Long memberId, ModifyMemberDto modifyMemberdto); //회원 정보 수정
 
     Member getMyInfo(Long memberId); //내 정보(회원) 조회
 
