@@ -9,15 +9,12 @@ import javax.validation.constraints.Pattern;
 @Data
 public class SignUpMemberDto {
 
-    @NotBlank
     @Pattern(regexp = "^[a-z0-9-_]{6,20}+$")
     private String loginId;
 
-    @NotBlank
     @Pattern(regexp = "^[a-zA-Z0-9`~!@#$%^&*()-_=+)]{8,15}+$")
     private String password;
 
-    @NotBlank
     @Pattern(regexp = "^[a-zA-Z가-힣]{2,20}+$")
     private String name;
 
