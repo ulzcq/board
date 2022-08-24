@@ -3,6 +3,7 @@ package hello.board.domain.member;
 import hello.board.MemberConst;
 import hello.board.global.exception.MemberException;
 import hello.board.web.member.ModifyMemberDto;
+import hello.board.web.member.ModifyPasswordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 시스템 예외상황이 아닌 비지니스 예외상황 시(일반적으로 IO 등이 아닌 개발자가 예상가능한 상황)
+ * 가급적 예외를 터트리지 않고, 앞에서 한번 체크
+ * 다만 심각한 비즈니스 상황에서는 예외를 발생시킨다
+ */
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -46,10 +52,22 @@ public class MemberServiceImpl implements MemberService {
         member.updateName(modifyMemberdto.getName()); //이름 변경
     }
 
-    /** 내 정보 조회*/
+    /** 비밀번호 변경
+     * @return true : 성공
+     * @return false : 비밀번호 불일치
+     */
+    @Transactional
     @Override
-    public Member getMyInfo(Long memberId) {
-        return memberRepository.findById(memberId);
+    public boolean updatePassword(Long memberId, ModifyPasswordDto modifyPasswordDto) {
+        Member member = memberRepository.findById(memberId);
+
+        //입력한 현재 비밀번호가 일치하는지 확인
+        if(!member.matchPassword(passwordEncoder, modifyPasswordDto.getCurrentPassword())){
+            return false;
+        }
+
+        member.updatePassword(passwordEncoder, modifyPasswordDto.getChangePassword()); //비밀번호 변경
+        return true;
     }
 
     /** 로그인
