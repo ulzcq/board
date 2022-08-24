@@ -40,10 +40,13 @@ public class MemberController {
     public String singUp(@Validated @ModelAttribute("member") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
         //1) 검증 에러가 있으면 회원가입 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
+            // 로그인 아이디 중복 에러도 있으면 같이 띄워준다
+            if(memberServiceImpl.validateDuplicateMember(signUpMemberDto.getLoginId()) == false){
+                result.reject("signUpFail", MemberConst.USERID_ALREADY_EXIST);
+            }
             log.info("errors= {}", result);
             return "member/signUpMemberForm";
         }
-
         //에러가 없으면 회원가입 처리 : dto -> entity
         Member member = signUpMemberDto.toEntity();
 

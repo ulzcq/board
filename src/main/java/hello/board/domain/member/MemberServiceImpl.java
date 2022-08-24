@@ -29,19 +29,26 @@ public class MemberServiceImpl implements MemberService {
      * */
     @Transactional
     public Long join(Member member) {
-        validateDuplicateMember(member); // 중복  ID 검증
+        boolean state = validateDuplicateMember(member.getLoginId());// 중복  ID 검증
+        if(state == false){
+            return null;
+        }
         member.encodePassword(passwordEncoder); // 패스워드 암호화
 
         return memberRepository.save(member);
     }
 
-    /** 중복 회원 검증 */
-    public void validateDuplicateMember(Member member){
+    /** 중복 회원 검증
+     * @return true : 성공
+     * @return false : 로그인 Id 중복
+     */
+    public boolean validateDuplicateMember(String loginId){
         //DB에 Id를 가진 회원이 있는지 확인
-        Member findMember = memberRepository.findByLoginId(member.getLoginId());
+        Member findMember = memberRepository.findByLoginId(loginId);
         if(findMember != null){
-            throw new MemberException(MemberConst.USERID_ALREADY_EXIST); //TODO: 예외처리
+            return false;
         }
+        return true;
     }
 
     /** 회원 정보 수정 */

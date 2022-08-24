@@ -8,7 +8,7 @@ import java.util.List;
 public interface MemberService {
     Long join(Member member); //회원가입
 
-    void validateDuplicateMember(Member member); //중복 회원 검증
+    boolean validateDuplicateMember(String loginId); //중복 ID 검증
 
     Member login(String loginId, String password); //로그인
 
