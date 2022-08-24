@@ -29,15 +29,15 @@ public class MemberController {
 
     /** 회원 가입 폼 */
     @GetMapping("/members/new")
-    public String signUpForm(@ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto){
-        return "members/signUpMemberForm";
+    public String signUpForm(@ModelAttribute("member") SignUpMemberDto signUpMemberDto){
+        return "member/signUpMemberForm";
     }
 
     /** 회원 가입
      *  유효성 검사 복습하기 @Validated, BindingResult
      */
     @PostMapping("/members/new")
-    public String singUp(@Validated @ModelAttribute("signUpForm") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
+    public String singUp(@Validated @ModelAttribute("member") SignUpMemberDto signUpMemberDto, BindingResult result, RedirectAttributes redirectAttributes){
         //1) 검증 에러가 있으면 회원가입 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
             log.info("errors= {}", result);
@@ -65,7 +65,7 @@ public class MemberController {
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             @PathVariable("memberId") Long memberId, Model model){
 
-        //다른 멤버 아이디로 url 조회 시 로그인 폼으로
+        //다른 멤버 아이디로 url 조회 시 로그인 폼으로 TODO: 이부분을 토큰?으로 인증하는건가?
         if(loginMember.getId() != memberId){
             return "redirect:/login";
         }
@@ -97,16 +97,54 @@ public class MemberController {
         return "redirect:/member/{memberId}";
     }
 
+    /** 비밀번호 변경 폼 */
+    @GetMapping("/member/{memberId}/password")
+    public String viewModifyPassword(
+            @ModelAttribute("passwordForm") ModifyPasswordDto modifyPasswordDto,
+            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+            @PathVariable("memberId") Long memberId){
+
+        //다른 멤버 아이디로 url 조회 시 로그인 폼으로
+//        if(loginMember.getId() != memberId){
+//            return "redirect:/login";
+//        }
+
+        return "member/modifyPasswordForm";
+    }
+
+
+    /** 비밀번호 변경*/
+    @PostMapping("/member/{memberId}/password")
+    public String modifyPassword(@Validated @ModelAttribute("passwordForm") ModifyPasswordDto modifyPasswordDto, BindingResult result,
+                               @PathVariable("memberId") Long memberId, RedirectAttributes redirectAttributes){
+
+        //검증 에러가 있으면 다시 돌려보낸다
+        if(result.hasErrors()){
+            return "member/modifyPasswordForm";
+        }
+
+        boolean state = memberServiceImpl.updatePassword(memberId, modifyPasswordDto);
+        if(state == false){
+            result.reject("modifyPassFail", MemberConst.INCORRECT_PASSWORD);
+            return "member/modifyPasswordForm";
+        }
+
+        //완료창 띄우기 위한 attribute
+        redirectAttributes.addFlashAttribute("result", true);
+
+        return "redirect:/member/{memberId}/password";
+    }
+
     /** 로그인 화면 폼 */
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("member") LoginDto loginDto){
+    public String loginForm(@ModelAttribute("loginForm") LoginDto loginDto){
         return "login/loginForm";
     }
 
     /** 로그인 */
     @PostMapping("/login")
     @ExceptionHandler
-    public String login(@Validated @ModelAttribute("member") LoginDto loginDto, BindingResult result,
+    public String login(@Validated @ModelAttribute("loginForm") LoginDto loginDto, BindingResult result,
                         @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request){
         //1) 검증 에러가 있으면 로그인 폼으로 다시 돌려보낸다
         if(result.hasErrors()){
