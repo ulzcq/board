@@ -108,9 +108,9 @@ public class MemberController {
             @PathVariable("memberId") Long memberId){
 
         //다른 멤버 아이디로 url 조회 시 로그인 폼으로
-//        if(loginMember.getId() != memberId){
-//            return "redirect:/login";
-//        }
+        if(loginMember.getId() != memberId){
+            return "redirect:/login";
+        }
 
         return "member/modifyPasswordForm";
     }

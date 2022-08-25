@@ -1,13 +1,13 @@
 package hello.board.domain.member;
 
+import hello.board.domain.post.Post;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 엔티티에는 가급적 Setter를 사용하지 않는다
@@ -30,6 +30,9 @@ public class Member {
 
     @Column(nullable = false, length = 20)
     private String name; //이름
+
+    @OneToMany(mappedBy = "member") //post(*)의 member가 연관관계의 주인
+    private List<Post> posts =  new ArrayList<>();
 
     public Member(String loginId, String password, String name) {
         this.loginId = loginId;
