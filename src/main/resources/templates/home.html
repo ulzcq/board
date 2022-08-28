@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/base :: head(~{::link}, ~{::style})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Home</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+<header th:replace="layout/base :: body(~{::header})"></header>
+
+<script th:inline="javascript">
+    const result = [[${result}]];
+    if(result == true){
+        alert("회원가입이 완료되었습니다.");
+    }
+</script>
+
+<!-- Begin page content -->
+<main class="flex-shrink-0">
+    <div class="container" style="max-width: 700px">
+
+        <div class="jumbotron" style="margin-top: 50px">
+            <h1 class="display-4">! Hello Board !</h1>
+            <p class="lead">💌 회원전용 게시판을 제공하는 서비스입니다. 로그인이 필요합니다.</p>
+            <hr class="my-4">
+            <p>회원가입 후 게시판을 이용해 보세요.</p>
+            <div class="row">
+                <div class="col">
+                    <button class="w-100 btn btn-dark btn-lg" type="button"
+                            th:onclick="|location.href='@{/members/new}'|">
+                        회원 가입
+                    </button>
+                </div>
+
+                <div class="col">
+                    <button class="w-100 btn btn-dark btn-lg" type="button"
+                            th:onclick="|location.href='@{/login}'|">
+                        로그인
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<div th:insert="~{/layout/footer :: copy}"></div>
+
+</body>
+</html>

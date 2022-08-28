@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/base :: head(~{::link}, ~{::style})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>로그인</title>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+<header th:replace="layout/base :: body(~{::header})"></header>
+
+<!-- Begin page content -->
+<main class="flex-shrink-0">
+    <div class="container" style="max-width: 300px; margin-top: 50px">
+
+        <div class="py-3 text-center">
+            <h2>로그인</h2>
+        </div>
+
+        <form action="../post/postList.html" th:action th:object="${loginForm}" method="post">
+
+            <div th:if="${#fields.hasGlobalErrors()}">
+                <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
+            </div>
+
+            <input type="text" id="loginId" th:field="*{loginId}" class="form-control mb-1"
+                   th:errorclass="field-error" placeholder="아이디">
+
+            <input type="text" id="password" th:field="*{password}" class="form-control"
+                   th:errorclass="field-error" placeholder="비밀번호">
+
+
+            <div class="field-error" th:errors="*{loginId}">로그인 ID 오류</div>
+
+            <div class="field-error" th:errors="*{password}">비밀번호 오류</div>
+
+
+            <div class="row mt-3 justify-content-around">
+                <div class="col text-center">
+                    <button class="btn btn-outline-dark myButton-pink" type="submit">로그인</button>
+                </div>
+
+                <div class="col text-center">
+                    <button class="btn btn-outline-dark myButton-pink"
+                            th:onclick="|location.href='@{/}'|" type="button">취소
+                    </button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+</main>
+
+<div th:insert="~{/layout/footer :: copy}"></div>
+
+</body>
+</html>
