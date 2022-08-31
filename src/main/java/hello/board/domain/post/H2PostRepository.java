@@ -21,8 +21,8 @@ public class H2PostRepository implements PostRepository{
     }
 
     @Override
-    public void delete(Long postId) {
-        em.remove(postId);
+    public void delete(Post post) {
+        em.remove(post);
     }
 
     @Override

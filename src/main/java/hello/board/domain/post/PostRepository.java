@@ -8,7 +8,7 @@ public interface PostRepository {
 
     Long save(Post post); //글 저장
 
-    void delete(Long postId); //글 삭제
+    void delete(Post post); //글 삭제
 
     Post findById(Long id);//글 1개 조회
 
