@@ -1,7 +1,9 @@
 package hello.board.domain.file;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -11,8 +13,12 @@ import java.util.List;
 import java.util.UUID;
 
 /** MultipartFile을 서버에 저장하는 역할 담당 (서비스) */
-@Component
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class FileServiceImpl {
+
+    private final H2FileRepository fileRepository;
 
     @Value("${file.dir}")
     private String fileDir;
@@ -63,6 +69,18 @@ public class FileServiceImpl {
         return originalFilename.substring(pos + 1);
     }
 
+    /** 파일 조회 */
+    public List<UploadFile> findFileList(Long postId){
+        return fileRepository.findAllByPostId(postId);
+    }
+
     /** 파일 삭제 메서드 */
-    //TODO
+    public void deleteFile(Long fileId){
+        fileRepository.delete(fileId);
+    }
+
+    /** 해당 게시글의 모든 파일 삭제*/
+    public void deleteAllFile(Long postId){
+        fileRepository.deleteAllByPostId(postId);
+    }
 }
