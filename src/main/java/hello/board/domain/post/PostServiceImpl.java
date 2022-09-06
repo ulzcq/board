@@ -48,7 +48,18 @@ public class PostServiceImpl implements PostService{
     public void update(Long postId, String title, String content, List<UploadFile> attachFiles) {
         //영속상태의 엔티티를 찾아오면 값 변경 시 커밋 때 자동반영
         Post findPost = postRepository.findById(postId);
+
+        //첨부파일이 있으면 연관관계 설정
+        if(!CollectionUtils.isEmpty(attachFiles)){
+            for (UploadFile attachFile : attachFiles) {
+                if(attachFile != null){
+                    attachFile.setPost(findPost);
+                }
+            }
+        }
+
         findPost.change(title, content, attachFiles);
+
     }
 
     /** 게시글 삭제 */
