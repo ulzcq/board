@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/base :: head(~{::link}, ~{::style})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>게시물 상세조회</title>
+</head>
+<body class="d-flex flex-column h-100">
+
+<header th:replace="layout/base :: body(~{::header})"></header>
+
+<!-- Begin page content -->
+<main class="flex-shrink-0">
+    <div class="container" style="margin-top: 50px">
+        <div class="row">
+            <div class="col me-3 text-center" style="max-width: 250px; font-size: 13px;">
+                <div class="row list-group">
+                    <a th:href="@{/posts}" class="list-group-item list-group-item-action">회원전용 게시판</a>
+                    <a href="@{/posts}" class="list-group-item list-group-item-action">💩 게시판</a>
+                    <a href="#" class="list-group-item list-group-item-action">👼 게시판</a>
+                    <a href="#" class="list-group-item list-group-item-action">앙앙잉 게시판</a>
+                </div>
+
+                <div class="row mt-4 justify-content-center">
+                    <button class="btn btn-outline-dark myButton-pink " type="button"
+                            th:onclick="|location.href='@{/post/new}'|">
+                        새 글 쓰기
+                    </button>
+                </div>
+            </div>
+
+            <div class="col container p-5" style="border: solid 2px lightpink; border-radius: 30px;">
+                <div class="row">
+                    <table class="table-borderless">
+                        <tr>
+                            <td class="fs-5" colspan="6" th:text="${post.title}">
+                                제목
+                            </td>
+                        </tr>
+                        <tr class="myFont">
+                            <td style="width: 10%">작성자</td> <td style="width: 10%" th:text="${post.writer}"></td>
+                            <td style="width: 10%">날짜</td> <td style="width: 50%" th:text="${#temporals.format(post.date, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td style="width: 10%">조회수</td><td style="width: 10%" th:text="${post.views}"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <hr class="my-4">
+                            </td>
+                        <tr class="myFont">
+                            <td colspan="5" th:text="${post.content}">내용</td>
+                            <td colspan="1">
+                                <div class="btn-group" role="group">
+                                    <button th:disabled="${#lists.size(post.uploadFiles) == 0}? 'true':'false'"
+                                            type="button" class="btn dropdown-toggle myButton-pink"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        첨부파일
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li th:each="uploadFile : ${post.uploadFiles}">
+                                            <a class="dropdown-item"
+                                               th:href="|/download/${post.postId}/${uploadFile.fileId}|"
+                                               th:text="${uploadFile.getUploadFileName()}">
+                                                첨부파일 이름
+                                            </a>
+                                            <span th:text="|${uploadFile.getFileSize()}kb|"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row mt-5 g-0">
+                    <div class="col text-lg-start col-md-2">
+                        <button class="btn btn-outline-dark myButton-pink" type="button"
+                                th:onclick="|location.href='/posts'|">
+                            돌아가기
+                        </button>
+                    </div>
+
+                    <div class="col text-lg-start col-md-2">
+                        <button id="modifyBtn" class="btn btn-outline-dark myButton-pink" type="button" style="display: none"
+                                th:onclick="|location.href='/post/${post.postId}/modify?writerId=${post.writerId}'|">
+                            수정
+                        </button>
+                    </div>
+
+
+                    <div class="col text-lg-start col-md-2">
+                        <form action="" th:action='@{/post/{postId}/delete(postId=${post.postId}, writerId=${post.writerId})}' th:method="post">
+                            <button id="deleteBtn" class="btn btn-outline-dark myButton-pink" type="submit" style="display: none">
+                                삭제
+                            </button>
+                        </form>
+                    </div>
+
+                    <script th:inline="javascript">
+                        let memberId = [[${session.loginMember.id}]];
+                        let writerId = [[${post.writerId}]]
+
+                        // 토글 할 버튼 선택 (btn1)
+                        const btn1 = document.querySelector('#modifyBtn');
+                        const btn2 = document.querySelector('#deleteBtn');
+
+                        // 버튼 숨기기 : 본인 id가 아니면
+                        if(memberId == writerId) {
+                            btn1.style.display = 'block';
+                            btn2.style.display = 'block';
+                        }
+                    </script>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<div th:insert="~{/layout/footer :: copy}"></div>
+
+<!-- BootStrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+</body>
+</html>
