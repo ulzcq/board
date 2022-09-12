@@ -3,6 +3,7 @@ package hello.board.domain.post;
 import hello.board.domain.file.UploadFile;
 import hello.board.domain.member.H2MemberRepository;
 import hello.board.domain.member.Member;
+import hello.board.web.post.MyPageble;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,9 +90,13 @@ public class PostServiceImpl implements PostService{
 
     /** 게시글 리스트 조회 (게시판) */
     @Override
-    public List<Post> getPagePosts(int offset, int limit) {
-        return postRepository.findListWithMember(offset, limit);
+    public List<Post> getPagePosts(MyPageble myPageble) {
+        return postRepository.findListWithMember(myPageble);
         //위임만 하기 때문에 이런 경우는 컨트롤러에서 바로 불러도 괜찮다고 함(선택사항)
     }
 
+    @Override
+    public long getCountPosts() {
+        return postRepository.findAllCnt();
+    }
 }

@@ -1,6 +1,7 @@
 package hello.board.domain.post;
 
 import hello.board.domain.file.UploadFile;
+import hello.board.web.post.MyPageble;
 
 import java.util.List;
 
@@ -17,5 +18,7 @@ public interface PostService {
     /** 조회 */
     Post viewPost(Long postId);
 
-    List<Post> getPagePosts(int offset, int limit);
+    List<Post> getPagePosts(MyPageble myPageble);
+
+    long getCountPosts();
 }

@@ -1,8 +1,7 @@
 package hello.board.domain.post;
 
-import hello.board.web.post.PostPagingInfoDto;
+import hello.board.web.post.MyPageble;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -37,12 +36,18 @@ public class H2PostRepository implements PostRepository{
         }
     }
 
-    public List<Post> findListWithMember(int offset, int limit) {
+    public List<Post> findListWithMember(MyPageble myPageble) {
         return em.createQuery(
                 "select p from Post p"+
                         " join fetch p.member m order by p.id desc", Post.class)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
+                .setFirstResult(myPageble.getPageStat())
+                .setMaxResults(myPageble.getSize())
                 .getResultList();
+    }
+
+    @Override
+    public long findAllCnt() {
+        return (long) em.createQuery("select count(p) from Post p")
+                .getSingleResult();
     }
 }
