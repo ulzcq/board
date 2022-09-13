@@ -58,7 +58,7 @@
                                     <ul class="dropdown-menu">
                                         <li th:each="uploadFile : ${post.uploadFiles}">
                                             <a class="dropdown-item"
-                                               th:href="|/download/${post.postId}/${uploadFile.fileId}|"
+                                               th:href="|/download/${postId}/${uploadFile.fileId}|"
                                                th:text="${uploadFile.getUploadFileName()}">
                                                 첨부파일 이름
                                             </a>
@@ -77,21 +77,21 @@
                 <div class="row mt-5 g-0">
                     <div class="col text-lg-start col-md-2">
                         <button class="btn btn-outline-dark myButton-pink" type="button"
-                                th:onclick="|location.href='/posts'|">
+                                th:onclick="|location.href='/posts?page=${page}'|">
                             돌아가기
                         </button>
                     </div>
 
                     <div class="col text-lg-start col-md-2">
                         <button id="modifyBtn" class="btn btn-outline-dark myButton-pink" type="button" style="display: none"
-                                th:onclick="|location.href='/post/${post.postId}/modify?writerId=${post.writerId}'|">
+                                th:onclick="|location.href='/post/${postId}/modify?writerId=${post.writerId}&page=${page}'|">
                             수정
                         </button>
                     </div>
 
 
                     <div class="col text-lg-start col-md-2">
-                        <form action="" th:action='@{/post/{postId}/delete(postId=${post.postId}, writerId=${post.writerId})}' th:method="post">
+                        <form action="" th:action='@{/post/{postId}/delete(postId=${postId}, writerId=${post.writerId}, page=${page})}' th:method="post">
                             <button id="deleteBtn" class="btn btn-outline-dark myButton-pink" type="submit" style="display: none">
                                 삭제
                             </button>

@@ -79,80 +79,68 @@
             </div>
 
             <div class="col">
-                <table class="table table-hover" style="font-size: 14px;">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>제목</th>
-                        <th>작성자</th>
-                        <th>날짜</th>
-                        <th>조회수</th>
-                    </tr>
-                    </thead>
-                    <tr th:each="postPreview : ${postPreviews}">
-                        <td th:text="${postPreview.postId}"></td>
-                        <td>
-                            <a th:href="@{/post/{postId}(postId=${postPreview.postId})}"
-                               th:text="${postPreview.title}">상세보기</a>
-                        </td>
-                        <td th:text="${postPreview.writer}"></td>
-                        <td th:text="${#temporals.format(postPreview.date, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td th:text="${postPreview.views}"></td>
-                    </tr>
-                    <tbody>
-                    </tbody>
-                </table>
-
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                        <li class="page-item"><a class="page-link" href="#">6</a></li>
-                        <li class="page-item"><a class="page-link" href="#">7</a></li>
-                        <li class="page-item"><a class="page-link" href="#">8</a></li>
-                        <li class="page-item"><a class="page-link" href="#">9</a></li>
-                        <li class="page-item"><a class="page-link" href="#">10</a></li>
-
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-
-                    </ul>
-                </nav>
-
-                <div class="w3-bar pagingBox">
-                    <div th:if test="${pagingInfo.prev}">
-                        <a onclick="getPage(1);" class="w3-button">««</a>
-                        <a onclick="getPage(${pagingInfo.cri.pageNum - 1});" href="#" class="w3-button">«</a>
-                    </div>
-                    <div th:each= var="i" begin="${pagingInfo.startPage}" end="${pagingInfo.endPage }">
-                        <c:choose>
-                            <c:when test="${i == pagingInfo.cri.pageNum }">
-                                <a onclick="getPage(${i});" class="w3-button w3-green">${i}</a>
-                            </c:when>
-                            <c:otherwise>
-                                <a onclick="getPage(${i});" class="w3-button">${i}</a>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                    <c:if test="${pagingInfo.next}">
-                        <a onclick="getPage(${pagingInfo.cri.pageNum + 1});" class="w3-button">»</a>
-                        <a onclick="getPage(${pagingInfo.lastPage});" class="w3-button">»»</a>
-                    </c:if>
+                <div class="row">
+                    <table class="table table-hover" style="font-size: 14px;">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>제목</th>
+                            <th>작성자</th>
+                            <th>날짜</th>
+                            <th>조회수</th>
+                        </tr>
+                        </thead>
+                        <tr th:each="postPreview : ${pagingInfo.postPreviewList}">
+                            <td th:text="${postPreview.postId}"></td>
+                            <td>
+                                <a th:href="@{/post/{postId}(postId=${postPreview.postId}, page=${pagingInfo.number})}"
+                                   th:text="${postPreview.title}">상세보기</a>
+                            </td>
+                            <td th:text="${postPreview.writer}"></td>
+                            <td th:text="${#temporals.format(postPreview.date, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="${postPreview.views}"></td>
+                        </tr>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
 
+                <div class="row">
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-center myPaging-pink"
+                            th:with="start=${pagingInfo.startPage}, last=${pagingInfo.endPage}">
+
+                            <li class="page-item">
+                                <a class="page-link" th:href="@{/posts(page=1)}" aria-label="First">
+                                    <span>&laquo;</span>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${pagingInfo.firstBlock} ? 'disabled'">
+                                <a class="page-link" th:href="${pagingInfo.firstBlock} ? '#' : @{/posts(page=${pagingInfo.number - 10})}">
+                                    <span aria-hidden="true">&lt;</span>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:each="page : ${#numbers.sequence(start, last)}" th:classappend="${page == pagingInfo.number} ? 'active'">
+                                <a class="page-link" th:text="${page}" th:href="@{/posts(page=${page})}"></a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${pagingInfo.endBlock} ? 'disabled'">
+                                <a class="page-link" th:href="${pagingInfo.endBlock} ? '#' : @{/posts(page=${start + 10})}">
+                                    <span aria-hidden="true">&gt;</span>
+                                </a>
+                            </li>
+
+                            <li class="page-item">
+                                <a class="page-link" th:href="@{/posts(page=${pagingInfo.totalPages})}" aria-label="Last">
+                                    <span>&gg;</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
 

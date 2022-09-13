@@ -54,3 +54,12 @@ code {
 .myFont{
     font-size: 12px;
 }
+
+.myPaging-pink li a{
+    color: lightpink;
+}
+
+.active>.page-link{
+    background-color: lightpink;
+    border-color: lightpink;
+}
