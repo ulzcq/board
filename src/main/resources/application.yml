@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/board
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+#        show_sql: true  #콘솔보다는 로그에 남기자
+        format_sql: true
+
+  messages:
+    basename: errors
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+logging.level:
+  org.hibernate.SQL: debug
+#  org.hibernate.type: trace #파라미터 바인딩까지 볼 수 있는 옵션
+
+custom:
+  path:
+    file-dir: C:/Users/uzeeni/study/file/
