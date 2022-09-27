@@ -20,7 +20,7 @@ public class FileServiceImpl {
 
     private final H2FileRepository fileRepository;
 
-    @Value("${file.dir}")
+    @Value("${custom.path.file-dir}")
     private String fileDir;
 
     public String getFullPath(String filename){
