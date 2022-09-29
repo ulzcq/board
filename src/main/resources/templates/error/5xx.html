@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout/base :: head(~{::link}, ~{::style})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>내 정보</title>
+</head>
+<body class="d-flex flex-column h-100">
+
+<header th:replace="layout/base :: body(~{::header})"></header>
+
+<main class="flex-shrink-0">
+    <div class="container" style="max-width: 500px">
+
+        <div style="display: none">
+            <p>스프링 기본 5xx 에러 페이지 경로, 문구는 네이버를 참고</p>
+        </div>
+
+        <div class="jumbotron" style="margin-top: 50px">
+            <h3>잠시 후 다시 확인해주세요!</h3>
+            <hr class="my-4">
+
+            <p>지금 이 서비스와 연결할 수 없습니다..</p>
+            <p>문제를 해결하기 위해 열심히 노력하고 있습니다.</p>
+            <p>잠시 후 다시 확인해주세요.</p>
+
+            <br>
+            <div class="row">
+                <button class="w-100 btn btn-dark btn-lg" type="button"
+                        th:onclick="history.go(-1)">
+                    돌아가기
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>
