@@ -1,8 +1,10 @@
 package hello.board.domain.post;
 
 import hello.board.domain.file.UploadFile;
-import hello.board.domain.member.H2MemberRepository;
 import hello.board.domain.member.Member;
+import hello.board.domain.member.MemberRepository;
+import hello.board.global.exception.CustomException;
+import hello.board.global.exception.CustomExceptionType;
 import hello.board.web.post.MyPageble;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ public class PostServiceImpl implements PostService{
     public void update(Long postId, String title, String content, List<UploadFile> attachFiles) {
         //영속상태의 엔티티를 찾아오면 값 변경 시 커밋 때 자동반영
         Post findPost = postRepository.findById(postId);
+        if(findPost == null) throw new CustomException(CustomExceptionType.NOT_FOUND_POST);
 
         //첨부파일이 있으면 연관관계 설정
         if(!CollectionUtils.isEmpty(attachFiles)){
@@ -68,13 +71,16 @@ public class PostServiceImpl implements PostService{
     @Override
     public void delete(Long postId) {
         Post findPost = postRepository.findById(postId);
+        if(findPost == null) throw new CustomException(CustomExceptionType.NOT_FOUND_POST);
         postRepository.delete(findPost);
     }
 
     /** 게시글 한 개 찾기*/
     @Override
     public Post findOne(Long postId) {
-        return postRepository.findById(postId);
+        Post findPost = postRepository.findById(postId);
+        if(findPost == null) throw new CustomException(CustomExceptionType.NOT_FOUND_POST);
+        return findPost;
     }
 
     /** 게시글 조회
@@ -84,6 +90,7 @@ public class PostServiceImpl implements PostService{
     @Override
     public Post viewPost(Long postId) {
         Post findPost = postRepository.findById(postId);
+        if(findPost == null) throw new CustomException(CustomExceptionType.NOT_FOUND_POST);
         findPost.cntViews();
         return findPost;
     }

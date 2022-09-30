@@ -1,7 +1,7 @@
 package hello.board.domain.member;
 
-import hello.board.MemberConst;
-import hello.board.global.exception.MemberException;
+import hello.board.global.exception.CustomException;
+import hello.board.global.exception.CustomExceptionType;
 import hello.board.web.member.ModifyMemberDto;
 import hello.board.web.member.ModifyPasswordDto;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 시스템 예외상황이 아닌 비지니스 예외상황 시(일반적으로 IO 등이 아닌 개발자가 예상가능한 상황)
@@ -56,6 +57,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void update(Long memberId, ModifyMemberDto modifyMemberdto) {
         Member member = memberRepository.findById(memberId);
+        if(member == null) throw new CustomException(CustomExceptionType.NOT_FOUND_MEMBER);
         member.updateName(modifyMemberdto.getName()); //이름 변경
     }
 
@@ -84,8 +86,10 @@ public class MemberServiceImpl implements MemberService {
     public Member login(String loginId, String password){
         Member member = memberRepository.findByLoginId(loginId);
         //패스워드 일치 확인
-        if(!member.matchPassword(passwordEncoder, password)){
-            return null;
+        if(member != null){
+            if(!member.matchPassword(passwordEncoder, password)){
+                return null;
+            }
         }
         return member;
     }
