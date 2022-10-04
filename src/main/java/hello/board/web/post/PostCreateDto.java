@@ -1,7 +1,9 @@
 package hello.board.web.post;
 
 import hello.board.domain.post.Post;
+import hello.board.web.file.UploadFileDto;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -16,7 +18,8 @@ import static java.util.stream.Collectors.toList;
  *  게시글 등록 & 수정용 DTO
  */
 @Data
-public class CreatePostDto {
+@NoArgsConstructor
+public class PostCreateDto {
 
     @NotBlank
     private String title; //제목
@@ -35,10 +38,8 @@ public class CreatePostDto {
         return new Post(title, content, LocalDateTime.now(), 0);
     }
 
-    public CreatePostDto(){} //없으면 에러남(?)
-
     /** 수정용 **/
-    public CreatePostDto(Post post) {
+    public PostCreateDto(Post post) {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.memberId = post.getMember().getId();

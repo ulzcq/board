@@ -2,6 +2,7 @@ package hello.board.web.post;
 
 import hello.board.domain.post.Post;
 
+import hello.board.web.file.UploadFileDto;
 import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,4 +1,4 @@
-package hello.board.web.post;
+package hello.board.web.file;
 
 import hello.board.PostConst;
 import hello.board.domain.file.UploadFile;
