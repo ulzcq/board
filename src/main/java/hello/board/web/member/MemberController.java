@@ -4,7 +4,6 @@ import hello.board.SessionConst;
 import hello.board.domain.member.Member;
 import hello.board.MemberConst;
 import hello.board.domain.member.MemberServiceImpl;
-import hello.board.global.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -50,11 +49,9 @@ public class MemberController {
         //에러가 없으면 회원가입 처리 : dto -> entity
         Member member = signUpMemberDto.toEntity();
 
-        Long savedId = memberServiceImpl.join(member);
+        Member savedMember = memberServiceImpl.join(member);
         //2) 회원가입 실패 시 회원가입 폼으로 다시 돌려보낸다
-        if(savedId == null){
-            return "member/signUpMemberForm";
-        }
+        if(savedMember == null) return "member/signUpMemberForm";
 
         //회원가입 완료창 띄우기 위한 attribute
         redirectAttributes.addFlashAttribute("result", true);
@@ -74,9 +71,6 @@ public class MemberController {
         }
 
         Member findMember = memberServiceImpl.findOne(memberId);
-        if(findMember == null){
-            throw new MemberException(MemberConst.NOT_FOUND_MEMBER);
-        }
         ModifyMemberDto modifyMemberDto = new ModifyMemberDto(findMember);
         model.addAttribute("member", modifyMemberDto);
 

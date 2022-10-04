@@ -22,14 +22,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
-    private final H2MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
     /** 회원 가입
      * @return null 이면 회원가입 실패
-     * */
+     */
     @Transactional
-    public Long join(Member member) {
+    public Member join(Member member) {
         boolean state = validateDuplicateMember(member.getLoginId());// 중복  ID 검증
         if(state == false){
             return null;
@@ -45,7 +45,8 @@ public class MemberServiceImpl implements MemberService {
      */
     public boolean validateDuplicateMember(String loginId){
         //DB에 Id를 가진 회원이 있는지 확인
-        Member findMember = memberRepository.findByLoginId(loginId);
+        Member findMember = memberRepository.findByLoginId(loginId).orElse(null);
+
         if(findMember != null){
             return false;
         }
@@ -56,8 +57,8 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public void update(Long memberId, ModifyMemberDto modifyMemberdto) {
-        Member member = memberRepository.findById(memberId);
-        if(member == null) throw new CustomException(CustomExceptionType.NOT_FOUND_MEMBER);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionType.NOT_FOUND_MEMBER));
         member.updateName(modifyMemberdto.getName()); //이름 변경
     }
 
@@ -68,7 +69,8 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public boolean updatePassword(Long memberId, ModifyPasswordDto modifyPasswordDto) {
-        Member member = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionType.NOT_FOUND_MEMBER));
 
         //입력한 현재 비밀번호가 일치하는지 확인
         if(!member.matchPassword(passwordEncoder, modifyPasswordDto.getCurrentPassword())){
@@ -84,7 +86,8 @@ public class MemberServiceImpl implements MemberService {
      */
     @Transactional
     public Member login(String loginId, String password){
-        Member member = memberRepository.findByLoginId(loginId);
+        Member member = memberRepository.findByLoginId(loginId).orElse(null);
+
         //패스워드 일치 확인
         if(member != null){
             if(!member.matchPassword(passwordEncoder, password)){
@@ -101,7 +104,8 @@ public class MemberServiceImpl implements MemberService {
 
     /** 회원 1명 조회 */
     public Member findOne(Long memberId){
-        return memberRepository.findById(memberId);
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(CustomExceptionType.NOT_FOUND_MEMBER));
     }
 
 }

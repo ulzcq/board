@@ -6,7 +6,7 @@ import hello.board.web.member.ModifyPasswordDto;
 import java.util.List;
 
 public interface MemberService {
-    Long join(Member member); //회원가입
+    Member join(Member member); //회원가입
 
     boolean validateDuplicateMember(String loginId); //중복 ID 검증
 
