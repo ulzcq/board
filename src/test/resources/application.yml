@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: test
 
   datasource:
     url: jdbc:h2:tcp://localhost/~/board
@@ -13,7 +13,7 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-#        show_sql: true  #콘솔보다는 로그에 남기자
+        #        show_sql: true  #콘솔보다는 로그에 남기자
         format_sql: true
 
   messages:
