@@ -6,12 +6,13 @@ import hello.board.domain.file.FileServiceImpl;
 import hello.board.domain.file.UploadFile;
 import hello.board.domain.member.Member;
 import hello.board.domain.post.Post;
+import hello.board.domain.post.PostSearchCondition;
 import hello.board.domain.post.PostServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Controller
@@ -44,14 +44,14 @@ public class PostController {
 
     /** 일반 게시글 작성 폼 */
     @GetMapping("/post/new")
-    public String createPostForm(@ModelAttribute("post") CreatePostDto createPostDto){
+    public String createPostForm(@ModelAttribute("post") PostCreateDto postCreateDto){
         return "post/createPostForm";
     }
 
     /** 일반 게시글 작성 */
     @PostMapping("/post/new")
     public String createPost(
-            @Validated @ModelAttribute("post") CreatePostDto createPostDto, BindingResult result,
+            @Validated @ModelAttribute("post") PostCreateDto postCreateDto, BindingResult result,
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             RedirectAttributes redirectAttributes) throws IOException {
 
@@ -61,18 +61,15 @@ public class PostController {
         }
 
         //파일 체크
-        List<UploadFile> addFileList = checkFiles(createPostDto.getMultipartFiles());
+        List<UploadFile> addFileList = checkFiles(postCreateDto.getMultipartFiles());
         if (addFileList == null){ //실패 시 다시 폼으로
             result.reject("fileUploadFail", PostConst.FILE_SIZE_EXCEEDED);
             return "post/createPostForm";
         }
 
-        //검증 성공 시 작성 처리 : form -> entity
-        Post post = createPostDto.toEntity();
-
-        //게시글 생성
-        Long createdId = postServiceImpl.create(loginMember.getId(), addFileList, post);
-        if(createdId == null){
+        //검증 성공 시 작성 처리
+        Post createdPost = postServiceImpl.create(loginMember.getId(), addFileList, postCreateDto);
+        if(createdPost == null){
             return "post/createPostForm"; //실패 시 다시 폼으로
         }
 
@@ -108,17 +105,14 @@ public class PostController {
      */
     @GetMapping("/posts")
     public String list(
-            @RequestParam(value = "page", defaultValue = "1") int page, //현재 페이지
+            @PageableDefault(size = 10)
+            Pageable pageable,
+            @ModelAttribute PostSearchCondition postSearchCondition,
             Model model){
 
-        //페이징
-        long totalElementNum = postServiceImpl.getCountPosts(); //전체 게시글 개수 조회
-        MyPageble myPageble = new MyPageble(page, totalElementNum);
-        List<Post> postList = postServiceImpl.getPagePosts(myPageble);
-        PostPagingDto postPagingDto= new PostPagingDto(postList, myPageble);
-
+        Page<Post> searchResults = postServiceImpl.searchPagePosts(postSearchCondition, pageable);
+        PostPagingDto postPagingDto= new PostPagingDto(searchResults);
         log.info("currentBlock={} start={}, end={}, currentPage={}", postPagingDto.getBlock(), postPagingDto.getStartPage(), postPagingDto.getEndPage(), postPagingDto.getNumber());
-
         model.addAttribute("pagingInfo", postPagingDto);
 
         return "post/postList";
@@ -133,9 +127,7 @@ public class PostController {
     public String viewPostInfo(@PathVariable("postId") Long postId,
                                @RequestParam(value = "page", defaultValue = "1") int page,
                                Model model){
-        Post post = postServiceImpl.viewPost(postId);
-        //entity -> dto
-        PostInfoDto postInfoDto = new PostInfoDto(post);
+        PostInfoDto postInfoDto = new PostInfoDto(postServiceImpl.viewPost(postId)); //entity -> dto
         model.addAttribute("post", postInfoDto);
         model.addAttribute("page", page);
 
@@ -187,10 +179,7 @@ public class PostController {
             return "redirect:/login";
         }
 
-        //보여줄 원래 내용 찾아서 entity -> dto
-        Post post = postServiceImpl.findOne(postId);
-        CreatePostDto dto = new CreatePostDto(post);
-
+        PostCreateDto dto = new PostCreateDto(postServiceImpl.findOne(postId)); //entity -> dto
         model.addAttribute("post", dto);
         model.addAttribute("page", page);
 
@@ -203,7 +192,7 @@ public class PostController {
 //            @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
             @PathVariable("postId") Long postId,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @ModelAttribute("post") CreatePostDto createPostDto, BindingResult result,
+            @ModelAttribute("post") PostCreateDto postCreateDto, BindingResult result,
             RedirectAttributes redirectAttributes) throws IOException {
 
         //검증확인
@@ -211,8 +200,8 @@ public class PostController {
             return "/post/{postId}/modify";
         }
 
-        List<Long> nonDeletedFileId = createPostDto.getNonDeletedFileId();//삭제되지 않고 남은 기존 파일(storedFileList는 왜 null이 될까 ㅠ)
-        List<MultipartFile> addFileList = createPostDto.getMultipartFiles(); //수정 시 추가된 파일
+        List<Long> nonDeletedFileId = postCreateDto.getNonDeletedFileId();//삭제되지 않고 남은 기존 파일(storedFileList는 왜 null이 될까 ㅠ)
+        List<MultipartFile> addFileList = postCreateDto.getMultipartFiles(); //수정 시 추가된 파일
         List<UploadFile> dbFileList = fileServiceImpl.findFileList(postId); //DB에 저장된 파일
 
         log.info("기존에서 남은파일: {}개",nonDeletedFileId != null ?nonDeletedFileId.size():0);
@@ -249,8 +238,8 @@ public class PostController {
         //검증 성공 시 게시글 수정
         postServiceImpl.update(
                 postId,
-                createPostDto.getTitle(),
-                createPostDto.getContent(),
+                postCreateDto.getTitle(),
+                postCreateDto.getContent(),
                 checkedFileList
         );
 

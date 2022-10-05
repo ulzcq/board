@@ -1,19 +1,12 @@
 package hello.board.domain.post;
 
-import hello.board.web.post.MyPageble;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+public interface PostRepository extends JpaRepository<Post, Long>, CustomPostRepository{
 
-public interface PostRepository {
-
-    Long save(Post post); //글 저장
-
-    void delete(Post post); //글 삭제
-
-    Post findById(Long id);//글 1개 조회
-
-    List<Post> findListWithMember(MyPageble myPageble);//글 5개 조회
-
-    long findAllCnt();
-
+    //fetch 조인의 간편 버전, left outer join
+    @EntityGraph(attributePaths = "member")
+    Post findWithMemberById(@Param("id") Long id);
 }

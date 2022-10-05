@@ -1,13 +1,15 @@
 package hello.board.domain.post;
 
 import hello.board.domain.file.UploadFile;
-import hello.board.web.post.MyPageble;
+import hello.board.web.post.PostCreateDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface PostService {
 
-    Long create(Long memberId, List<UploadFile> attachFiles, Post post);
+    Post create(Long memberId, List<UploadFile> attachFiles, PostCreateDto postCreateDto);
 
     void update(Long postId, String title, String content, List<UploadFile> attachFiles);
 
@@ -18,7 +20,5 @@ public interface PostService {
     /** 조회 */
     Post viewPost(Long postId);
 
-    List<Post> getPagePosts(MyPageble myPageble);
-
-    long getCountPosts();
+    Page<Post> searchPagePosts(PostSearchCondition postSearchCondition, Pageable pageable);
 }

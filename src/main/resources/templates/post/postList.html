@@ -108,33 +108,33 @@
                 <div class="row">
                     <nav>
                         <ul class="pagination pagination-sm justify-content-center myPaging-pink"
-                            th:with="start=${pagingInfo.startPage}, last=${pagingInfo.endPage}">
+                            th:with="start=${pagingInfo.startPage}, end=${pagingInfo.endPage}, current=${pagingInfo.number}">
 
-                            <li class="page-item">
-                                <a class="page-link" th:href="@{/posts(page=1)}" aria-label="First">
-                                    <span>&laquo;</span>
+                            <li class="page-item" th:classappend="${pagingInfo.firstBlock} ? 'disabled'">
+                                <a class="page-link" th:href="@{/posts(page=1)}" aria-label="FirstBlock">
+                                    <span>처음</span>
                                 </a>
                             </li>
 
                             <li class="page-item" th:classappend="${pagingInfo.firstBlock} ? 'disabled'">
-                                <a class="page-link" th:href="${pagingInfo.firstBlock} ? '#' : @{/posts(page=${pagingInfo.number - 10})}">
-                                    <span aria-hidden="true">&lt;</span>
+                                <a class="page-link" th:href="@{/posts(page=${end - pagingInfo.blockSize})}" aria-label="이전블록의 마지막페이지(맨마지막 블록은 적용안됨)">
+                                    <span aria-hidden="true">이전</span>
                                 </a>
                             </li>
 
-                            <li class="page-item" th:each="page : ${#numbers.sequence(start, last)}" th:classappend="${page == pagingInfo.number} ? 'active'">
+                            <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}" th:classappend="${page == current} ? 'active'">
                                 <a class="page-link" th:text="${page}" th:href="@{/posts(page=${page})}"></a>
                             </li>
 
                             <li class="page-item" th:classappend="${pagingInfo.endBlock} ? 'disabled'">
-                                <a class="page-link" th:href="${pagingInfo.endBlock} ? '#' : @{/posts(page=${start + 10})}">
-                                    <span aria-hidden="true">&gt;</span>
+                                <a class="page-link" th:href="@{/posts(page=${start + pagingInfo.blockSize})}" aria-label="다음블록의 첫페이지">
+                                    <span aria-hidden="true">다음</span>
                                 </a>
                             </li>
 
-                            <li class="page-item">
-                                <a class="page-link" th:href="@{/posts(page=${pagingInfo.totalPages})}" aria-label="Last">
-                                    <span>&gg;</span>
+                            <li class="page-item" th:classappend="${current == pagingInfo.totalPages} ? 'disabled'">
+                                <a class="page-link" th:href="@{/posts(page=${pagingInfo.totalPages})}" aria-label="EndBlock">
+                                    <span>끝</span>
                                 </a>
                             </li>
 

@@ -13,6 +13,7 @@ public class PostPreviewDto {
     private Long postId;
     private String writer; //작성자
     private String title; //제목
+    private String content; //내용(검색용)
     private LocalDateTime date; //작성 날짜
     private int views;//조회수
 
@@ -20,6 +21,7 @@ public class PostPreviewDto {
         this.postId = post.getId();
         this.writer = post.getMember().getName(); //LAZY 초기화
         this.title = post.getTitle();
+        this.content = post.getContent();
         this.date = post.getDate();
         this.views = post.getViews();
     }
