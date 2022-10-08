@@ -34,12 +34,7 @@
 
                 <span class="navbar-text me-2" style="color: whitesmoke">
                         안녕하세요 <span th:text="${session.loginMember.name}"></span>님^―^
-                    </span>
-
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success myButton-pink" type="submit">Search</button>
-                </form>
+                </span>
             </div>
         </div>
     </nav>
@@ -57,7 +52,7 @@
 
 <!-- Begin page content -->
 <main class="flex-shrink-0">
-    <div class="container" style="margin-top: 50px">
+    <div class="container my-5">
         <div class="row">
             <div class="col me-3 text-center" style="max-width: 250px; font-size: 13px;">
                 <div class="row list-group">
@@ -71,7 +66,7 @@
                 </div>
 
                 <div class="row mt-4 justify-content-center">
-                    <button class="btn btn-outline-dark myButton-pink " type="button"
+                    <button class="btn btn-outline-dark myButton-pink" type="button"
                             th:onclick="|location.href='@{/post/new}'|">
                         새 글 쓰기
                     </button>
@@ -140,6 +135,15 @@
 
                         </ul>
                     </nav>
+                </div>
+
+                <div class="row justify-content-center mb-2">
+                    <div class="col col-lg-5" th:object="${postSearchCondition}">
+                        <form class="d-flex">
+                            <input th:field="*{title}" class="form-control me-2 myFont" type="search" placeholder="제목으로 검색" aria-label="Search">
+                            <button class="btn btn-outline-dark myButton-pink" type="submit" th:onclick="|location.href='@{/posts}'|">검색</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
