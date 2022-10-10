@@ -1,5 +1,6 @@
 package hello.board.domain.post;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -36,8 +37,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository{
                 .leftJoin(post.member, member)
                 .where(
                         writerNameEq(condition.getWriter()),
-                        titleHasStr(condition.getTitle()),
-                        contentHasStr(condition.getContent())
+                        titleContentHasStr(condition.getTitle(), condition.getContent())
                 )
                 .orderBy(post.id.desc())
                 .offset(pageable.getOffset())
@@ -48,8 +48,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository{
                 .selectFrom(post)
                 .where(
                         writerNameEq(condition.getWriter()),
-                        titleHasStr(condition.getTitle()),
-                        contentHasStr(condition.getContent())
+                        titleContentHasStr(condition.getTitle(), condition.getContent())
                 );
 
         /**
@@ -62,8 +61,14 @@ public class CustomPostRepositoryImpl implements CustomPostRepository{
         return PageableExecutionUtils.getPage(content, pageable, () -> countQuery.fetch().size());
     }
 
+    private BooleanExpression titleContentHasStr(String title, String content) {
+        if(isEmpty(title)) return contentHasStr(content);
+        else if(isEmpty(content)) return titleHasStr(title);
+        else return post.title.contains(title).or(post.content.contains(content));
+    }
+
     private BooleanExpression writerNameEq(String writer) {
-        return isEmpty(writer) ? null : member.name.eq(writer);
+        return isEmpty(writer) ? null : post.member.name.eq(writer);
     }
 
     private BooleanExpression titleHasStr(String title) {

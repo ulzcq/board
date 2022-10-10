@@ -107,12 +107,23 @@ public class PostController {
     public String list(
             @PageableDefault(size = 10)
             Pageable pageable,
-            @ModelAttribute PostSearchCondition postSearchCondition,
+            @RequestParam(required = false) String searchType, @RequestParam(required = false) String searchString,
             Model model){
+
+        log.info("!searchType={}, searchString={}",searchType, searchString);
+        PostSearchCondition postSearchCondition = new PostSearchCondition();
+
+        if(searchType!= null && searchString!=null){
+            if(searchType.equals("title") || searchType.equals("tc")) postSearchCondition.setTitle(searchString);
+            if(searchType.equals("content") || searchType.equals("tc")) postSearchCondition.setContent(searchString);
+            else if(searchType.equals("writer")) postSearchCondition.setWriter(searchString);
+
+            model.addAttribute("searchType", searchType);
+            model.addAttribute("searchString", searchString);
+        }
 
         Page<Post> searchResults = postServiceImpl.searchPagePosts(postSearchCondition, pageable);
         PostPagingDto postPagingDto= new PostPagingDto(searchResults);
-        log.info("currentBlock={} start={}, end={}, currentPage={}", postPagingDto.getBlock(), postPagingDto.getStartPage(), postPagingDto.getEndPage(), postPagingDto.getNumber());
         model.addAttribute("pagingInfo", postPagingDto);
 
         return "post/postList";
